@@ -22,4 +22,4 @@ Sharesafe is a web application which allows users to securely share files. Users
 
 [Click here to try this application](https://willeyappsharesafe.azurewebsites.net/)
 
-[Click here to learn how this project was developed](https://ochuwilliams.hashnode.dev/employee-onboard-automator-using-azure-logic-apps)
+[Click here to learn how this project was developed](https://ochuwilliams.hashnode.dev/sharesafe)
