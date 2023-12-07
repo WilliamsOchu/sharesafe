@@ -45,6 +45,7 @@ def handle_data():
         ## Let's get the Blob content which was just uploaded to the container
         blob_client = container_client.get_blob_client(path_to_blob.filename)
         expiry=datetime.utcnow() + timedelta(days=1)
+        good_expiry = expiry.strftime('%Y-%m-%d at exactly %H:%M:%S')
 
         # Generate a SAS token for the blob container
         sas_token = generate_blob_sas(
@@ -59,7 +60,7 @@ def handle_data():
         ##Create a URL for our generated SAS token
         blob_sas_url = "{}?{}".format(blob_client.url, sas_token)
         download_link = blob_sas_url
-        return render_template('output.html', download_link=download_link)
+        return render_template('output.html', download_link=download_link, good_expiry=good_expiry)
                
     except Exception as ex:
         print('Exception:')
