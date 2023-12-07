@@ -1,57 +1,49 @@
-from flask import Flask, render_template, request
-
 ## Import necessary modules
+from flask import Flask, render_template, request
 import os
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
 from datetime import datetime, timedelta
 
+## Initiate the flask app
 app = Flask(__name__)
 
+## Establish a connection with Azure Key_Vault 
 keyVaultName = os.environ["KEY_VAULT_NAME"]
 KVUri = "https://{}.vault.azure.net".format(keyVaultName)
 credential = DefaultAzureCredential()
 secret_client = SecretClient(vault_url=KVUri, credential=credential)
 
+## Display the app landing page
 @app.route('/')
 def get_data():
     return render_template('input.html')
 
+## Upload file and Generate download link 
+
 @app.route('/', methods=["POST"])
 def handle_data():
-    path = request.form['path']
+    ## Get the file to be uploaded
+    path = request.files.get("path")
 
     try:
         # Retrieve the connection string for use with the application.
         connect_str = secret_client.get_secret("azurestorageconnectstring").value
         blob_service_client = BlobServiceClient.from_connection_string(connect_str)
         
-
-
         # Retrieve the container name 
         container_name = secret_client.get_secret('sgsharesafecontainer').value
         container_client = blob_service_client.get_container_client(container_name)
         
-        # Enter the relative file path
+        # Establish the file location
         path_to_blob = path
 
-        # Create a blob client
-        filename = os.path.basename(path_to_blob)
-        blob_client = blob_service_client.get_blob_client(container=container_name, blob=filename)
-
-        # Display blob upload message
-        #print("<html><body><p>\nUploading to Azure Storage as blob:\n\t</p></body></html>" + filename)
-
         # Upload the created file
-        with open(file=path_to_blob, mode="rb") as data:
-            blob_client.upload_blob(data)
-        
-        #print('<html><body><p>Upload complete !!</p></body></html>\n')
-        #print('<html><body><p>Generating download link  ... Link valid for only 24 hours !</p></body></html>\n')
-        
+        container_client.upload_blob(path_to_blob.filename, path_to_blob)      
+            
         ## Let's get the Blob content which was just uploaded to the container
-        blob_client = container_client.get_blob_client(filename)
+        blob_client = container_client.get_blob_client(path_to_blob.filename)
         expiry=datetime.utcnow() + timedelta(days=1)
 
         # Generate a SAS token for the blob container
@@ -66,14 +58,12 @@ def handle_data():
         
         ##Create a URL for our generated SAS token
         blob_sas_url = "{}?{}".format(blob_client.url, sas_token)
-        dounload_link = "Your secured download link is :\n{}".format(blob_sas_url)
-        return dounload_link
-          
-
+        download_link = blob_sas_url
+        return render_template('output.html', download_link=download_link)
+               
     except Exception as ex:
         print('Exception:')
         print(ex)
-
        
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

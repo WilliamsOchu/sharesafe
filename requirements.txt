@@ -1,2 +1,7 @@
-azure_storage==0.37.0
+azure-identity==1.15.0
+azure-keyvault-administration==4.3.0
+azure-keyvault-certificates==4.7.0
+azure-keyvault-keys==4.8.0b2
+azure-keyvault-secrets==4.7.0
+azure-storage-blob==12.19.0
 Flask==3.0.0

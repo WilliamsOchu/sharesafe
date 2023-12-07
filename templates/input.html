@@ -6,17 +6,16 @@
     <title>Sharesafe_input</title>
 </head>
 <body>
-    <h4>Enter Absolute Filepath:</h4>
-    <form method="post">
-        <div class="form__fieldset">
-         <label for="path" class="form__label">Enter Path: </label>
-         <input type="text" name="path" id="path" class="form__input"/>
+    <b>Select your file:</b>
+    <div class="form-group">
+    <form method="post"
+        enctype="multipart/form-data">
+        <div style="display: flex;">
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+            <input type="file" name="path" id="path" multiple class="form-control" style="margin-right: 2em;">
+            <br>
+            <button type="submit">Upload</button>
         </div>
-        <br>
-        <button type="submit">Upload</button>
-
     </form>
-
-
 </body>
 </html>
